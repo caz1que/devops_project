@@ -1,0 +1,11 @@
+---
+
+- name: Copying a join command to server
+  copy: 
+    src: /tmp/join-command
+    dest: /tmp/join-command.sh
+    mode: 0777
+
+- name: Join to cluster 
+  shell:
+    cmd: '/tmp/join-command.sh'

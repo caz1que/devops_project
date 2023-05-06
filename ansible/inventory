@@ -8,3 +8,8 @@ master-node-1 ansible_host=192.168.1.101
 [worker-nodes]
 worker-node-1 ansible_host=192.168.1.102
 worker-node-2 ansible_host=192.168.1.103
+
+[k8s-nodes:children]
+master-nodes
+worker-nodes
+

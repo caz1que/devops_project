@@ -1,0 +1,46 @@
+---
+
+- name: k8s install
+  block:
+
+  - name: Git clone
+    git:
+      repo: https://github.com/Mirantis/cri-dockerd.git
+      dest: /root/cri-dockerd
+
+  - name: Make bin directory
+    shell:
+      cmd: 'mkdir /root/cri-dockerd/bin'
+
+  - name: Go build
+    command:
+      chdir: '/root/cri-dockerd/'
+      cmd: 'go build -o bin/cri-dockerd'
+
+  - name: Make /usr/local/bin
+    shell:
+      cmd: 'mkdir -p /usr/local/bin'
+
+  - name: Modes
+    shell:
+      cmd: 'install -o root -g root -m 0755 /root/cri-dockerd/bin/cri-dockerd /usr/local/bin/cri-dockerd'
+
+  - name: Copy systemd files
+    shell:
+      cmd: 'cp -a packaging/systemd/* /etc/systemd/system'
+
+  - name: Sed of stroke
+    shell:
+      cmd: "sed -i -e 's,/usr/bin/cri-dockerd,/usr/local/bin/cri-dockerd,' /etc/systemd/system/cri-docker.service"
+
+  - name: Systemd daemon-reload & cri-dockerd enable
+    systemd:
+      daemon_reload: true
+      name: cri-docker.service 
+      enabled: true
+
+  - name: Systemd enable and start socket
+    shell:
+      cmd: 'systemctl enable --now cri-docker.socket'
+
+  tags: cri-dockerd

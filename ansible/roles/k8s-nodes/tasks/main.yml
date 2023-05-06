@@ -1,0 +1,43 @@
+---
+
+- name: Disable SWAP in fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^.*swap.*$'
+    replace: '#'
+
+- name: Disable SWAP by swapoff
+  shell:
+    cmd: 'swapoff -a'
+
+- name: Add k8s apt key
+  shell:
+    cmd: 'curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add'
+
+- name: Add k8s repository
+  apt_repository:
+    filename: k8s
+    repo: 'deb https://apt.kubernetes.io/ kubernetes-xenial main'
+
+- name: Update apt repositories after an adding a k8s repo
+  apt:
+    update_cache: true
+
+- name: Install k8s packages
+  apt:
+    name:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: iptables & conntrack error issue
+  shell:
+    cmd: 'cp /sbin/iptables* /bin/; cp /sbin/conntrack /bin/'
+
+- name: Install Go
+  include_tasks: go.yml
+  tags: go
+
+- name: Install cri-dockerd
+  include_tasks: cri-dockerd.yml
+  tags: cri-dockerd
