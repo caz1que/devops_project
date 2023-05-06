@@ -1,16 +1,16 @@
 ---
 
-#- name: Initialization of cluster
-#  command:
-#    cmd: 'kubeadm init --pod-network-cidr={{pod_network_cidr}} --cri-socket={{cri_socket}}'
+- name: Initialization of cluster
+  command:
+    cmd: 'kubeadm init --pod-network-cidr={{pod_network_cidr}} --cri-socket={{cri_socket}}'
 
-#- name: Export kubeconfig file
-#  shell:
-#    cmd: 'export KUBECONFIG=/etc/kubernetes/admin.conf'
+- name: Export kubeconfig file
+  shell:
+    cmd: 'export KUBECONFIG=/etc/kubernetes/admin.conf'
 
-#- name: Install network for pods
-#  shell:
-#    cmd: 'kubectl apply -f {{add_onn}}'
+- name: Install network for pods
+  shell:
+    cmd: 'kubectl apply -f {{add_onn}}'
 
 - name: Generate join command for worker nodes
   command:
