@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-deployment
+  labels:
+    app: python
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      labels:
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: caz1que/python-flask-app:22
+        ports:
+        - containerPort: 5000
+        env:
+        - name: db_root_password
+          valueFrom:
+            secretKeyRef:
+              name: python-app-secret
+              key: db_root_password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-service
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: python
+  type: LoadBalancer
