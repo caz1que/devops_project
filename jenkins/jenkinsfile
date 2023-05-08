@@ -1,0 +1,41 @@
+properties {[disableConcurrentBuilds()]}
+
+pipeline {
+    agent {
+        label 'master'
+    }
+    triggers {pollSCM('* * * * *')}
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '15', artifactNumToKeepStr: '15'))
+        timestamps()
+    }
+    parameters {
+        text (
+        name: 'TAG',
+        defaultValue: 'latest',
+        description: 'Type a tag'
+        )
+    }
+    stages {
+        stage ('Docker build') {
+          steps {
+            echo ('=== Docker building an image is started  ===')
+            dir ('python_app') {
+              sh """ 
+                docker build . -t caz1que/python-flask-app:${params.TAG}
+              """
+            }
+          }
+        }
+
+        stage('Docker push') {
+          steps {
+            echo ('=== Docker push ===')
+            sh """
+              docker push caz1que/python-flask-app:${params.TAG}
+            """
+          }
+        }
+ 
+    }
+}
